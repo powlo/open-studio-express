@@ -4,9 +4,19 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var artistRoute = require('./routes/artists');
+var artworksRoute = require('./routes/artworks');
+
+//db setup
+var url = 'mongodb://localhost:27017/opengallery';
+mongoose.connect(url);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+    console.log("Connected correctly to server");
+});
 
 var app = express();
 
@@ -22,8 +32,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
+app.use('/artists', artistRoute);
+app.use('/artworks', artworksRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -38,6 +48,7 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
+      console.log('There was an error: ' + err.message);
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -49,6 +60,7 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+    console.log('There was an error in production');
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
