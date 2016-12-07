@@ -5,12 +5,22 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var passport = require('passport');
 
-var artistRoute = require('./routes/artists');
+var authenticate = require('./authenticate');
+var config = require('./config.js');
+
+//Routes
+
+var usersRoute = require('./routes/users');
+var artistsRoute = require('./routes/artists');
 var artworksRoute = require('./routes/artworks');
 
+//Models
+var User = require('./models/user');
+
 //db setup
-var url = 'mongodb://localhost:27017/opengallery';
+var url = config.mongoUrl;
 mongoose.connect(url);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -32,7 +42,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/artists', artistRoute);
+app.use(passport.initialize());
+
+app.use('/users', usersRoute);
+app.use('/artists', artistsRoute);
 app.use('/artworks', artworksRoute);
 
 // catch 404 and forward to error handler
