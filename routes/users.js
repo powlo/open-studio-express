@@ -12,10 +12,9 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/register', function(req, res, next) {
-  console.log('registering user');
   User.register(new User({username: req.body.username}), req.body.password, function(err) {
     if (err) {
-      console.log('error while user register!', err);
+      console.log('error while registering user!', err);
       return next(err);
     }
 
@@ -26,7 +25,6 @@ router.post('/register', function(req, res, next) {
 });
 
 router.post('/login', function (req, res, next) {
-    console.log('oh hi');
     passport.authenticate('local', function (err, user, info) {
         if (err) {
             return next(err);
